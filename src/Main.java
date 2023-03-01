@@ -20,7 +20,7 @@ public class Main {
         Epic epic3 = new Epic("машина", "запчасти");
 
         Subtask subtask1 = new Subtask(2, "qwe", "ffffff", "NEW");
-        Subtask subtask2 = new Subtask(2, "qwууe", "fffууfff", "NEW");
+        Subtask subtask2 = new Subtask(2, "qwууe", "fffууfff", "DONE");
         Subtask subtask3 = new Subtask(2, "Pay", "Machine", "NEW");
         Subtask subtask4 = new Subtask(2, "wendy", "solo", "NEW");
 
@@ -31,12 +31,20 @@ public class Main {
         //manager.createSubtask(subtask4);
         manager.createTask(task2);
 
-         System.out.println(manager.getSubtaskByEpicId(2));
+        // System.out.println(manager.getSubtaskByEpicId(2));
 
-        subtask3.setId(2);
-        manager.updateSubtask(subtask3);
+       // subtask3.setId(2);
+       // manager.updateSubtask(subtask3);
+        System.out.println(manager.getAllEpics());
+        System.out.println(manager.getAllSubtasks());
 
+       // manager.deleteEpic(2);
+        manager.deleteSubtask(3);
 
+        System.out.println(manager.getAllEpics());
+        System.out.println(manager.getAllSubtasks());
+
+        System.out.println();
      /*
             System.out.println(manager.getSubtaskById(4));
             System.out.println(manager.getAllSubtasks());
