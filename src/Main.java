@@ -39,7 +39,8 @@ public class Main {
         System.out.println(manager.getAllSubtasks());
 
        // manager.deleteEpic(2);
-        manager.deleteSubtask(3);
+       // manager.deleteSubtask(3);
+        manager.deleteAllSubtasks();
 
         System.out.println(manager.getAllEpics());
         System.out.println(manager.getAllSubtasks());

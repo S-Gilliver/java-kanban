@@ -13,11 +13,10 @@ public class Manager {
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private int generatedId = 1;
 
-    public int createTask(Task task) {
+    public void createTask(Task task) {
         task.setId(generatedId++);
         task.setStatus("NEW");
         tasks.put(task.getId(), task);
-        return task.getId();
     }
 
     public void createEpic(Epic epic) {
@@ -64,13 +63,20 @@ public class Manager {
         updateEpicStatus(epic);
     }
 
-    public void deleteAllTask() {
+    public void deleteAllTasks() {
         tasks.clear();
     }
 
-    public void deleteAllEpic() {
+    public void deleteAllEpics() {
         epics.clear();
         subtasks.clear();
+    }
+
+    public void deleteAllSubtasks() {
+        subtasks.clear();
+        for (int epicId : epics.keySet()) {
+            epics.get(epicId).getSubtasks().clear();
+        }
     }
 
     public void updateTask(Task task) {
