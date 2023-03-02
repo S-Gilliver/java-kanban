@@ -27,7 +27,7 @@ public class Manager {
 
     public void createSubtask(Subtask subtask) {
         subtask.setId(generatedId++);
-        subtask.setStatus("NEW");
+      //  subtask.setStatus("NEW");
         Epic epic = epics.get(subtask.getEpicId());
         subtasks.put(subtask.getId(), subtask);
         epic.getSubtasks().add(subtask);
@@ -76,6 +76,7 @@ public class Manager {
         subtasks.clear();
         for (int epicId : epics.keySet()) {
             epics.get(epicId).getSubtasks().clear();
+            updateEpicStatus(epics.get(epicId));
         }
     }
 
