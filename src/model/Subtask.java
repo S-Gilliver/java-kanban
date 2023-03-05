@@ -3,7 +3,7 @@ package model;
 import java.util.Objects;
 
 public class Subtask extends Task {
-    private int epicId;
+    private final int epicId;
 
     public Subtask(int epicId, String taskName, String taskDescription, Status status) {
         super(taskName, taskDescription, status);
@@ -12,10 +12,6 @@ public class Subtask extends Task {
 
     public int getEpicId() {
         return epicId;
-    }
-
-    public void setEpicId(int epicId) {
-        this.epicId = epicId;
     }
 
     @Override
