@@ -36,7 +36,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void createSubtask(Subtask subtask) {
         subtask.setId(generatedId++);
         subtask.setStatus(Status.NEW);
-        Epic epic = epics.get(subtask.getEpicId());
+        final Epic epic = epics.get(subtask.getEpicId());
         subtasks.put(subtask.getId(), subtask);
         epic.getSubtasks().add(subtask);
         updateEpicStatus(epic);
@@ -64,7 +64,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteSubtask(Integer id) {
         int epicId = subtasks.get(id).getEpicId();
-        Epic epic = epics.get(epicId);
+        final Epic epic = epics.get(epicId);
         for (Subtask subtaskInEpic : epic.getSubtasks()) {
             if (subtaskInEpic.getId() == id) {
                 epic.getSubtasks().remove(subtaskInEpic);
@@ -111,14 +111,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
-        Epic epic = epics.get(subtask.getEpicId());
+        final Epic epic = epics.get(subtask.getEpicId());
         updateEpicStatus(epic);
     }
 
     @Override
     public ArrayList<Subtask> getSubtaskByEpicId(int epicId) {
         ArrayList<Subtask> subtaskByEpic = new ArrayList<>();
-        Epic epic = epics.get(epicId);
+        final Epic epic = epics.get(epicId);
         for (Subtask subtaskId : epic.getSubtasks()) {
             subtaskByEpic.add(subtaskId);
         }
