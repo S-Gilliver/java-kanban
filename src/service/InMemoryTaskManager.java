@@ -50,10 +50,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteEpic(int id) {
         Epic epic = epics.remove(id);
         for (Subtask subTask : epic.getSubtasks()) {
-            subtasks.remove(subTask);
+            subtasks.remove(subTask.getId());
             historyManager.remove(subTask.getId());
         }
-        epics.remove(id);
         historyManager.remove(id);
     }
 
@@ -108,22 +107,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask, int idSubtask) {
+    public void updateSubtask(Subtask subtask) {
         final Epic epic = epics.get(subtask.getEpicId());
         subtasks.put(subtask.getId(), subtask);
-        deleteSubtask(idSubtask);
+        epic.getSubtasks().remove(subtasks.put(subtask.getId(), subtask));
         epic.getSubtasks().add(subtask);
         updateEpicStatus(epic);
     }
 
     @Override
     public List<Subtask> getSubtaskByEpicId(int epicId) {
-        List<Subtask> subtaskByEpic = new ArrayList<>();
         final Epic epic = epics.get(epicId);
-        for (Subtask subtaskId : epic.getSubtasks()) {
-            subtaskByEpic.add(subtaskId);
-        }
-        return subtaskByEpic;
+        return new ArrayList<>(epic.getSubtasks());
     }
 
     private void updateEpicStatus(Epic epic) {
@@ -131,16 +126,18 @@ public class InMemoryTaskManager implements TaskManager {
         int allSubtaskNEW = 0;
         int allSubtaskDONE = 0;
         int allSubtaskStatus = 0;
-        Status status = null;
+        Status status;
 
         for (Subtask subtaskId : epic.getSubtasks()) {
             status = subtaskId.getStatus();
             allSubtaskStatus++;
             if (status.equals(Status.NEW)) {
                 allSubtaskNEW++;
-            }
-            if (status.equals(Status.DONE)) {
+            } else if (status.equals(Status.DONE)) {
                 allSubtaskDONE++;
+            } else {
+                epic.setStatus(Status.IN_PROGRESS);
+                return;
             }
         }
 
@@ -148,8 +145,6 @@ public class InMemoryTaskManager implements TaskManager {
             epic.setStatus(Status.NEW);
         } else if (allSubtaskDONE == allSubtaskStatus) {
             epic.setStatus(Status.DONE);
-        } else {
-            epic.setStatus(Status.IN_PROGRESS);
         }
     }
 

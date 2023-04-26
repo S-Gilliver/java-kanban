@@ -27,7 +27,7 @@ public class Main {
         Subtask subtask1 = new Subtask(3, "qwe", "ffffff", Status.NEW);
         Subtask subtask2 = new Subtask(3, "qwууe", "fffууfff", Status.DONE);
         Subtask subtask3 = new Subtask(3, "Pay", "Machine", Status.NEW);
-        Subtask subtask4 = new Subtask(3, "wendy", "solo", Status.NEW);
+        Subtask subtask4 = new Subtask(3, "wendy", "solo", Status.IN_PROGRESS);
 
         inMemoryTaskManager.createTask(task1);
         inMemoryTaskManager.createTask(task2);
@@ -43,7 +43,7 @@ public class Main {
         System.out.println(inMemoryTaskManager.getEpicById(7));
 
         System.out.println(inMemoryTaskManager.getAllEpics());
-        inMemoryTaskManager.updateSubtask(subtask4, 4);
+        inMemoryTaskManager.updateSubtask(subtask4);
         System.out.println(inMemoryTaskManager.getAllEpics());
 
         /*
