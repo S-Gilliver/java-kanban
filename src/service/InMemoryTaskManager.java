@@ -125,12 +125,11 @@ public class InMemoryTaskManager implements TaskManager {
         //(проверка на) изменение статуса епика после удаления или добавления подзадачи (subtask)
         int allSubtaskNEW = 0;
         int allSubtaskDONE = 0;
-        int allSubtaskStatus = 0;
+        int size = epic.getSubtasks().size();
         Status status;
 
         for (Subtask subtaskId : epic.getSubtasks()) {
             status = subtaskId.getStatus();
-            allSubtaskStatus++;
             if (status.equals(Status.NEW)) {
                 allSubtaskNEW++;
             } else if (status.equals(Status.DONE)) {
@@ -141,10 +140,12 @@ public class InMemoryTaskManager implements TaskManager {
             }
         }
 
-        if (allSubtaskNEW == allSubtaskStatus) {
+        if (allSubtaskNEW == size) {
             epic.setStatus(Status.NEW);
-        } else if (allSubtaskDONE == allSubtaskStatus) {
+        } else if (allSubtaskDONE == size) {
             epic.setStatus(Status.DONE);
+        } else {
+            epic.setStatus(Status.IN_PROGRESS);
         }
     }
 
