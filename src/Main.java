@@ -14,6 +14,8 @@ public class Main {
         File file = new File("tasks.txt");
         FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(file);
 
+        System.out.println(manager.getHistory());
+
         Task task1 = new Task("Дом", "убрать квартиру", Status.NEW);
         Task task2 = new Task("Хобби", "нарисовать картину", Status.NEW);
 
@@ -27,15 +29,17 @@ public class Main {
         manager.createTask(task1);
         manager.createTask(task2);
         manager.createEpic(epic1);
+        manager.createEpic(epic2);
         manager.createSubtask(subtask1);
         manager.createSubtask(subtask2);
         manager.createSubtask(subtask3);
-        manager.createEpic(epic2);
 
         System.out.println(manager.getTaskById(1));
         System.out.println(manager.getEpicById(3));
-        System.out.println(manager.getSubtaskByEpicId(3));
-        System.out.println(manager.getEpicById(7));
+        System.out.println(manager.getEpicById(4));
+        System.out.println(manager.getSubtaskById(5));
+
+        System.out.println(manager.getHistory());
 /*
         File file = new File("tasks.txt");
         FileBackedTasksManager manager = FileBackedTasksManager.loadFromFile(file);
