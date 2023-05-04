@@ -37,7 +37,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         FileBackedTasksManager manager = new FileBackedTasksManager(file);
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line = br.readLine();
-
             while ((line = br.readLine()) != null) {
                 if (line.equals("")) {
                     break;
@@ -67,8 +66,6 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-
         return manager;
     }
 
