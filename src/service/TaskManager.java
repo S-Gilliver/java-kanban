@@ -5,6 +5,7 @@ import model.Subtask;
 import model.Task;
 
 import java.util.List;
+import java.util.Set;
 
 public interface TaskManager {
     void createTask(Task task);
@@ -34,4 +35,8 @@ public interface TaskManager {
     Subtask getSubtaskById(int id);
 
     List<Task> getHistory();
+
+    public void addPrioritizedTasks(Task task);
+
+    public Set<Task> getPrioritizedTasks();
 }

@@ -16,7 +16,7 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     public void save() {
         try (Writer fileWriter = new FileWriter(file)) {
-            fileWriter.write("id,type,name,status,description,epic\n");
+            fileWriter.write("id,type,name,status,description,startTime,duration,endTime,epic\n");
 
             for (Task task : tasks.values()) {
                 fileWriter.write(toString(task));
@@ -71,11 +71,18 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
 
     private static Task fromString(String value) {
         List<String> tasks = List.of(value.split(","));
+        if (tasks.size() == 1) {
+            return null;
+        }
         switch (tasks.get(1)) {
             case "TASK":
                 Task task = new Task(tasks.get(2), tasks.get(4));
                 task.setStatus(Status.valueOf(tasks.get(3)));
                 task.setId(Integer.parseInt(tasks.get(0)));
+                if (!tasks.get(5).equals("null")) {
+                    task.setStartTime(tasks.get(5));
+                    task.setDuration(Integer.parseInt(tasks.get(6)));
+                }
                 return task;
             case "EPIC":
                 Epic epic = new Epic(tasks.get(2), tasks.get(4));
@@ -83,8 +90,15 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 epic.setId(Integer.parseInt(tasks.get(0)));
                 return epic;
             case "SUBTASK":
-                return new Subtask(Integer.parseInt(tasks.get(5)), tasks.get(2)
-                        , tasks.get(4), Status.valueOf(tasks.get(3)));
+                if (tasks.get(5).equals("null")) {
+                    return new Subtask(Integer.parseInt(tasks.get(8)), tasks.get(2)
+                            , tasks.get(4), Status.valueOf(tasks.get(3)));
+
+                } else {
+                    return new Subtask(Integer.parseInt(tasks.get(8)), tasks.get(2)
+                            , tasks.get(4), Status.valueOf(tasks.get(3))
+                            , Integer.parseInt(tasks.get(6)), tasks.get(5));
+                }
         }
         return null;
     }
@@ -215,15 +229,22 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 + TaskType.TASK + ","
                 + task.getTaskName() + ","
                 + task.getStatus() + ","
-                + task.getTaskDescription() + "\n";
+                + task.getTaskDescription() + ","
+                + task.getStartTime() + ","
+                + task.getDuration() + ","
+                + task.getEndTime() + "\n";
     }
+
 
     private String toString(Epic epic) {
         return epic.getId() + ","
                 + TaskType.EPIC + ","
                 + epic.getTaskName() + ","
                 + epic.getStatus() + ","
-                + epic.getTaskDescription() + "\n";
+                + epic.getTaskDescription() + ","
+                + epic.getStartTime() + ","
+                + epic.getDuration() + ","
+                + epic.getEndTime() + "\n";
     }
 
     private String toString(Subtask subtask) {
@@ -232,7 +253,11 @@ public class FileBackedTasksManager extends InMemoryTaskManager {
                 + subtask.getTaskName() + ","
                 + subtask.getStatus() + ","
                 + subtask.getTaskDescription() + ","
-                + subtask.getEpicId() + "\n";
+                + subtask.getStartTime() + ","
+                + subtask.getDuration() + ","
+                + subtask.getEndTime() + ","
+                + subtask.getEpicId() + ","
+                + "\n";
     }
 
     public static String historyToString(HistoryManager manager) {
