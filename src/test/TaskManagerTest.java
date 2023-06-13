@@ -282,26 +282,103 @@ abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void gettingAnEmptyTaskList() {
         Task task = createNewTaskByTest();
-        assertNull(manager.getTaskById(1));
+        manager.createTask(task);
         assertNull(manager.getTaskById(33));
+        assertEquals(List.of(task), manager.getAllTasks());
     }
 
     @Test
     public void gettingAnEmptyEpicList() {
         Epic epic = createNewEpicByTest();
-        assertNull(manager.getEpicById(1));
+        manager.createEpic(epic);
         assertNull(manager.getEpicById(33));
+        assertEquals(List.of(epic), manager.getAllEpics());
     }
 
     @Test
     public void gettingAnEmptySubtaskList() {
         Epic epic = createNewEpicByTest();
-        Subtask subtask = createNewSubtaskByTest(epic);
-
         manager.createEpic(epic);
-        assertNull(manager.getSubtaskById(1));
+        Subtask subtask = createNewSubtaskByTest(epic);
+        manager.createSubtask(subtask);
+
         assertNull(manager.getSubtaskById(33));
-        assertEquals(new ArrayList<>(), manager.getSubtaskByEpicId(1));
+        assertEquals(List.of(subtask), manager.getAllSubtasks());
+    }
+
+    @Test
+    public void gettingAnEmptySubtaskListByEpicId() {
+        Epic epic = createNewEpicByTest();
+        manager.createEpic(epic);
+
+        assertTrue(manager.getSubtaskByEpicId(epic.getId()).isEmpty());
+    }
+
+    @Test
+    public void getEmptyTask() {
+        assertTrue(manager.getAllTasks().isEmpty());
+    }
+
+    @Test
+    public void getEmptyEpic() {
+        assertTrue(manager.getAllEpics().isEmpty());
+    }
+
+    @Test
+    public void getEmptySubtask() {
+        assertTrue(manager.getAllSubtasks().isEmpty());
+    }
+
+    @Test
+    public void getEmptyTaskById() {
+        assertNull(manager.getSubtaskById(33));
+    }
+
+    @Test
+    public void getEmptyEpicById() {
+        assertNull(manager.getSubtaskById(33));
+    }
+
+    @Test
+    public void getEmptySubtaskById() {
+        assertNull(manager.getSubtaskById(33));
+    }
+
+    @Test
+    public void getEmptyHistoryAfterACall() {
+        manager.getTaskById(33);
+        manager.getEpicById(33);
+        manager.getSubtaskById(33);
+        assertTrue(manager.getHistory().isEmpty());
+    }
+
+    @Test
+    public void getEmptyHistory() {
+        assertTrue(manager.getHistory().isEmpty());
+    }
+
+    @Test
+    public void clearAllEmptyTask() {
+        manager.deleteAllTasks();
+        manager.deleteTask(33);
+
+        assertEquals(new ArrayList<>(), manager.getAllTasks());
+    }
+
+    @Test
+    public void clearAllEmptyEpic() {
+        manager.deleteAllEpics();
+        manager.deleteEpic(33);
+
+        assertEquals(new ArrayList<>(), manager.getAllEpics());
+    }
+
+    @Test
+    public void clearAllEmptySubtask() {
+        manager.deleteAllSubtasks();
+        manager.deleteSubtask(33);
+
+        assertEquals(new ArrayList<>(), manager.getAllSubtasks());
     }
 
     @Test

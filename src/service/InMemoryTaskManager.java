@@ -64,27 +64,31 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteEpic(int id) {
-        Epic epic = epics.remove(id);
-        for (Subtask subTask : epic.getSubtasks()) {
-            prioritizedTasks.remove(subTask);
-            subtasks.remove(subTask.getId());
-            historyManager.remove(subTask.getId());
+        if (epics.get(id) != null) {
+            Epic epic = epics.remove(id);
+            for (Subtask subTask : epic.getSubtasks()) {
+                prioritizedTasks.remove(subTask);
+                subtasks.remove(subTask.getId());
+                historyManager.remove(subTask.getId());
+            }
+            historyManager.remove(id);
         }
-        historyManager.remove(id);
     }
 
     @Override
     public void deleteSubtask(Integer id) {
-        historyManager.remove(id);
-        prioritizedTasks.remove(subtasks.get(id));
-        Subtask subtask = subtasks.remove(id);
-        int epicId = subtask.getEpicId();
-        final Epic epic = epics.get(epicId);
-        epic.getSubtasks().remove(subtask);
-        updateEpicStatus(epic);
-        epic.calculateStartTime();
-        epic.calculateDuration();
-        epic.calculateEndTime();
+        if (subtasks.get(id) != null) {
+            historyManager.remove(id);
+            prioritizedTasks.remove(subtasks.get(id));
+            Subtask subtask = subtasks.remove(id);
+            int epicId = subtask.getEpicId();
+            final Epic epic = epics.get(epicId);
+            epic.getSubtasks().remove(subtask);
+            updateEpicStatus(epic);
+            epic.calculateStartTime();
+            epic.calculateDuration();
+            epic.calculateEndTime();
+        }
     }
 
     @Override
@@ -120,9 +124,9 @@ public class InMemoryTaskManager implements TaskManager {
         validateTaskPriority(task);
         if (tasks.containsKey(task.getId())) {
             tasks.put(task.getId(), task);
+            prioritizedTasks.removeIf(task1 -> task1.getId() == task.getId());
+            addPrioritizedTasks(task);
         }
-        prioritizedTasks.removeIf(task1 -> task1.getId() == task.getId());
-        addPrioritizedTasks(task);
     }
 
     @Override

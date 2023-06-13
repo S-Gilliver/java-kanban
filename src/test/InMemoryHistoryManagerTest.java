@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.*;
 
 
-public class InMemoryHistoriManagerTest {
+public class InMemoryHistoryManagerTest {
     private HistoryManager manager;
 
     protected Task createNewTaskByTest() {
