@@ -345,6 +345,81 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
+    public void deleteATaskWithADifferentId() {
+        Task task = createNewTaskByTest();
+        manager.createTask(task);
+        manager.deleteTask(33);
+
+        assertEquals(List.of(task), manager.getAllTasks());
+    }
+
+    @Test
+    public void deleteAEpicWithADifferentId() {
+        Epic epic = createNewEpicByTest();
+        manager.createEpic(epic);
+        manager.deleteEpic(33);
+
+        assertEquals(List.of(epic), manager.getAllEpics());
+    }
+
+    @Test
+    public void deleteASubtaskWithADifferentId() {
+        Epic epic = createNewEpicByTest();
+        manager.createEpic(epic);
+        Subtask subtask = createNewSubtaskByTest(epic);
+        manager.createSubtask(subtask);
+        manager.deleteSubtask(33);
+
+        assertEquals(List.of(subtask), manager.getAllSubtasks());
+    }
+
+    @Test
+    public void deleteATaskWithADifferentIdWithoutCreatingASingleTask() {
+        manager.deleteTask(33);
+        assertNull(manager.getTaskById(33));
+        assertTrue(manager.getAllTasks().isEmpty());
+    }
+
+    @Test
+    public void deleteAEpicWithADifferentIdWithoutCreatingASingleEpic() {
+        manager.deleteEpic(33);
+        assertNull(manager.getEpicById(33));
+        assertTrue(manager.getAllEpics().isEmpty());
+    }
+
+    @Test
+    public void deleteASubtaskWithADifferentIdWithoutCreatingASingleSubtask() {
+        manager.deleteSubtask(33);
+        assertNull(manager.getSubtaskById(33));
+        assertTrue(manager.getAllSubtasks().isEmpty());
+    }
+
+    @Test
+    public void updateANonExistentTask() {
+        Task task = createNewTaskByTest();
+        manager.updateTask(task);
+        assertNull(manager.getTaskById(1));
+        assertTrue(manager.getAllTasks().isEmpty());
+    }
+
+    @Test
+    public void updateANonExistentEpic() {
+        Epic epic = createNewEpicByTest();
+        manager.updateEpic(epic);
+        assertNull(manager.getEpicById(1));
+        assertTrue(manager.getAllEpics().isEmpty());
+    }
+
+    @Test
+    public void updateANonExistentSubtask() {
+        Epic epic = createNewEpicByTest();
+        Subtask subtask = createNewSubtaskByTest(epic);
+        manager.updateSubtask(subtask);
+        assertNull(manager.getSubtaskById(1));
+        assertTrue(manager.getAllSubtasks().isEmpty());
+    }
+
+    @Test
     public void getEmptyHistoryAfterACall() {
         manager.getTaskById(33);
         manager.getEpicById(33);
