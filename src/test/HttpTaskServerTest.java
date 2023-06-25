@@ -40,14 +40,14 @@ class HttpTaskServerTest {
 
 
     private void createTasks() {
-        task1 = new Task("Test addNeTask", "Tet addNewEpic description",
+        task1 = new Task("Test addNeTask", "Tet addNewTask description",
                 Status.NEW, 30, "16:55 - 06.06.2023");
-        task2 = new Task("Test addNewTask", "Test addNewEpic description",
+        task2 = new Task("Test addNewTask", "Test NewTask description",
                 Status.NEW, 30, "16:00 - 06.06.2023");
-        epic1 = new Epic("Пустой эпик без сабтасок", "check");
-        epic2 = new Epic("Эпик с сабтасками", "check");
-        epic3 = new Epic("Пустой эпик без сабтасок", "double check!");
-        subTask1 = new Subtask(3 ,"Test addNeTask", "Tet addNewEpic description",
+        epic1 = new Epic("Test addNewEpic", "Tet addNewEpic description");
+        epic2 = new Epic("Test addEpic", "Tet NewEpic description");
+        epic3 = new Epic("Test NewEpic", "Tet addEpic description");
+        subTask1 = new Subtask(3 ,"Test addNewSubtask", "Tet addNewSubtask description",
                 Status.NEW, 45, "18:00 - 06.06.2023");
         taskManager.createTask(task1);
         taskManager.createTask(task2);
@@ -61,14 +61,14 @@ class HttpTaskServerTest {
     }
 
     @BeforeAll
-    static void start() throws IOException {
+    static void start() {
         gson = Manager.getGson();
         kvServer = new KVServer();
         kvServer.start();
     }
 
     @BeforeEach
-    void setUp() throws IOException, InterruptedException {
+    void setUp() throws IOException {
         taskManager = Manager.getDefault();
         httpTaskServer = new HttpTaskServer();
         createTasks();
@@ -228,6 +228,21 @@ class HttpTaskServerTest {
         assertNotNull(gson.fromJson(response.body(), new TypeToken<List<Task>>(){}.getType()));
         assertEquals(response.body(), "[]");
     }
+
+    @Test
+    void getEmptyPriorityTest() throws IOException, InterruptedException {
+
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create(PRIORITY_TASK_PATH);
+        HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        assertEquals(200, response.statusCode());
+        assertNotNull(gson.fromJson(response.body(), new TypeToken<List<Task>>(){}.getType()));
+        assertEquals(response.body(), "[]");
+    }
+
     @Test
     void getHistoryTest() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
@@ -252,7 +267,6 @@ class HttpTaskServerTest {
 
         assertEquals(200, response.statusCode());
         assertEquals(response.body(), gson.toJson(taskManager.getPrioritizedTasks()));
-
     }
 
 }
