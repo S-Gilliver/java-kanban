@@ -19,8 +19,12 @@ public class Manager {
         return new InMemoryTaskManager();
     }
 
-    public static TaskManager getDefaultHttp() throws IOException {
+    public static TaskManager getDefaultHttpNotLoad() throws IOException {
         return new HttpTaskManager("http://localhost:" + KVServer.PORT);
+    }
+
+    public static TaskManager getDefaultHttpAndLoad(Boolean load) throws IOException {
+        return new HttpTaskManager("http://localhost:" + KVServer.PORT, load);
     }
 
     public static HistoryManager getDefaultHistory() {

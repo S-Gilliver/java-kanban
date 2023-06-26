@@ -12,7 +12,7 @@ import java.io.IOException;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class SubtaskHandler implements HttpHandler {
+public class SubtaskHandler extends handle implements HttpHandler {
 
     private final Gson gson = Manager.getGson();
     private final TaskManager taskManager;
@@ -112,12 +112,5 @@ public class SubtaskHandler implements HttpHandler {
                 httpExchange.sendResponseHeaders(405, 0);
             }
         }
-    }
-
-    protected void sendText(HttpExchange exchange, String text) throws IOException {
-        byte[] resp = text.getBytes(UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, resp.length);
-        exchange.getResponseBody().write(resp);
     }
 }

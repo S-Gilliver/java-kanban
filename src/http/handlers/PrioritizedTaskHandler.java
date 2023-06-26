@@ -7,9 +7,7 @@ import service.TaskManager;
 
 import java.io.IOException;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public class PrioritizedTaskHandler implements HttpHandler {
+public class PrioritizedTaskHandler extends handle implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson = new Gson();
 
@@ -37,12 +35,5 @@ public class PrioritizedTaskHandler implements HttpHandler {
         }
 
         httpExchange.close();
-    }
-
-    protected void sendText(HttpExchange exchange, String text) throws IOException {
-        byte[] resp = text.getBytes(UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, resp.length);
-        exchange.getResponseBody().write(resp);
     }
 }

@@ -13,7 +13,7 @@ import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileBackedTasksManagerTest extends TaskManagerTest {
+public class FileBackedTasksManagerTest extends test.TaskManagerTest {
 
     @BeforeEach
     public void updateFileBackedTaskManager() {

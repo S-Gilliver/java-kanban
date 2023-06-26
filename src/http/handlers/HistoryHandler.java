@@ -7,9 +7,7 @@ import service.TaskManager;
 
 import java.io.IOException;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-public class HistoryHandler implements HttpHandler {
+public class HistoryHandler extends handle implements HttpHandler {
     private final TaskManager taskManager;
     private final Gson gson = new Gson();
 
@@ -36,12 +34,5 @@ public class HistoryHandler implements HttpHandler {
             System.out.println("Ожидали запрос GET, но получили: " + method);
         }
         httpExchange.close();
-    }
-
-    protected void sendText(HttpExchange exchange, String text) throws IOException {
-        byte[] resp = text.getBytes(UTF_8);
-        exchange.getResponseHeaders().add("Content-Type", "application/json");
-        exchange.sendResponseHeaders(200, resp.length);
-        exchange.getResponseBody().write(resp);
     }
 }

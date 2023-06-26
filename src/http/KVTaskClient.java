@@ -7,43 +7,69 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
 public class KVTaskClient {
-    private final String API_TOKEN;
-    private final String URL;
+    private final String apiToken;
+    private final String url;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString();
 
-    public KVTaskClient(String url) throws IOException, InterruptedException {
-        this.URL = url;
+    public KVTaskClient(String url) {
+        this.url = url;
         URI uri = URI.create(url + "/register");
-        HttpRequest request = HttpRequest.newBuilder().GET()
-                .uri(uri).version(HttpClient.Version.HTTP_1_1)
-                .header("Accept", "application/json")
-                .build();
-
-        HttpResponse<String> response = httpClient.send(request, handler);
-        API_TOKEN = response.body();
+        HttpRequest request = registration(uri);
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, handler);
+            if (response.statusCode() != 200) {
+                System.out.println("Не удалось обработать запрос");
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+        apiToken = response.body();
     }
 
-    public void put(String key, String json) throws IOException, InterruptedException {
-        URI uri = URI.create(URL + "/save/" + key + "?API_TOKEN=" + API_TOKEN);
+    public void put(String key, String json) {
+        URI uri = URI.create(url + "/save/" + key + "?API_TOKEN=" + apiToken);
         HttpRequest request = HttpRequest.newBuilder()
                 .POST(HttpRequest.BodyPublishers.ofString(json))
                 .uri(uri).version(HttpClient.Version.HTTP_1_1)
                 .header("Accept", "application/json")
                 .build();
 
-        HttpResponse<String> response = httpClient.send(request, handler);
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, handler);
+            if (response.statusCode() != 200) {
+                System.out.println("Не удалось сохранить данные");
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println(response.statusCode());
     }
 
-    public String load(String key) throws IOException, InterruptedException {
-        URI uri = URI.create(URL + "/load/" + key + "?API_TOKEN=" + API_TOKEN);
+    public String load(String key) throws RuntimeException {
+        URI uri = URI.create(url + "/load/" + key + "?API_TOKEN=" + apiToken);
+        HttpRequest request = registration(uri);
+
+        HttpResponse<String> response = null;
+        try {
+            response = httpClient.send(request, handler);
+            if (response.statusCode() != 200) {
+                System.out.println("Во время запроса произошла ошибка");
+            }
+        } catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+
+        }
+        return response.body();
+    }
+
+    private HttpRequest registration(URI uri) {
         HttpRequest request = HttpRequest.newBuilder().GET()
                 .uri(uri).version(HttpClient.Version.HTTP_1_1)
                 .header("Accept", "application/json")
                 .build();
-
-        HttpResponse<String> response = httpClient.send(request, handler);
-        return response.body();
+        return request;
     }
 }
