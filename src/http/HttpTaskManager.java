@@ -5,9 +5,7 @@ import com.google.gson.reflect.TypeToken;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-import model.TaskType;
 import service.FileBackedTasksManager;
-import service.InMemoryHistoryManager;
 import service.Manager;
 
 import java.io.File;
@@ -17,13 +15,12 @@ import java.util.stream.Collectors;
 
 public class HttpTaskManager extends FileBackedTasksManager {
     public final KVTaskClient httpClient;
-    private final Gson gson;
+    public final Gson gson;
     final static String KEY_TASKS = "tasks";
     final static String KEY_EPICS = "epics";
     final static String KEY_SUBTASKS = "subTasks";
     final static String KEY_HISTORY = "history";
 
-    InMemoryHistoryManager inMemoryHistoryManager;
     public HttpTaskManager(String url, Boolean load) {
         super(new File(url));
         httpClient = new KVTaskClient(url);
@@ -34,9 +31,7 @@ public class HttpTaskManager extends FileBackedTasksManager {
     }
 
     public HttpTaskManager(String url) {
-        super(new File(url));
-        httpClient = new KVTaskClient(url);
-        gson = Manager.getGson();
+        this(url, false);
     }
 
     @Override
@@ -62,36 +57,33 @@ public class HttpTaskManager extends FileBackedTasksManager {
         List<Task> tasksList = gson.fromJson((taskJson), new TypeToken<ArrayList<Task>>() {}.getType());
         if (tasksList != null) {
             for (Task t : tasksList) {
-                tasks.put(t.getId(), t);
+                createTask(t);
             }
         }
         List<Epic> epicsList = gson.fromJson((epicJson), new TypeToken<ArrayList<Epic>>() {}.getType());
         if (epicsList != null) {
             epicsList.forEach((epic) -> {
+                List<Subtask> subtasks2 = epic.getSubtasks();
                 epic.getSubtasks().clear();
-                epics.put(epicsList.get(0).getId(), (Epic) epicsList);
+               // epics.put(epicsList.get(0).getId(), (Epic) epicsList);
+                createEpic(epic);
+                for (Subtask subtask1 : subtasks2) {
+                    createSubtaskByEpicId(subtask1, taskIdGenerator.getId());
+                }
             });
         }
         List<Subtask> subTasksList = gson.fromJson((subTaskJson), new TypeToken<ArrayList<Subtask>>() {}.getType());
         if (subTasksList != null) {
             for (Subtask s : subTasksList) {
-                subtasks.put(s.getId(), s);
+                createSubtask(s);
             }
         }
-        inMemoryHistoryManager = new InMemoryHistoryManager();
+
         List<Integer> historyMemory = gson.fromJson((history), new TypeToken<ArrayList<Integer>>() {}.getType());
-        historyMemory.forEach((task) -> {
-            switch (TaskType.valueOf(task.getClass().getSimpleName().toUpperCase())) {
-                case TASK:
-                    inMemoryHistoryManager.add(tasks.get(task));
-                    break;
-                case EPIC:
-                    inMemoryHistoryManager.add(epics.get(task));
-                    break;
-                case SUBTASK:
-                    inMemoryHistoryManager.add(subtasks.get(task));
-                    break;
-            }
-        });
+        for (Integer idTask : historyMemory) {
+            getTaskById(idTask);
+            getEpicById(idTask);
+            getSubtaskById(idTask);
+        }
     }
 }

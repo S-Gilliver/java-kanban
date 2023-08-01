@@ -177,16 +177,23 @@ class HttpTaskServerTest {
     @Test
     void postSubtaskTest() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
-        URI uri = URI.create(SUBTASK_PATH);
+        URI uri1 = URI.create(EPIC_PATH);
+        URI uri2 = URI.create(SUBTASK_PATH);
 
+        String epicJson = gson.toJson(epic1);
         String subtaskJson = gson.toJson(subTask1);
 
-        HttpRequest.BodyPublisher bodyJson1 = HttpRequest.BodyPublishers.ofString(subtaskJson);
+        HttpRequest.BodyPublisher bodyJson1 = HttpRequest.BodyPublishers.ofString(epicJson);
+        HttpRequest.BodyPublisher bodyJson2 = HttpRequest.BodyPublishers.ofString(subtaskJson);
 
-        HttpRequest request1 = HttpRequest.newBuilder().POST(bodyJson1).uri(uri).build();
+        HttpRequest request1 = HttpRequest.newBuilder().POST(bodyJson1).uri(uri1).build();
+        HttpRequest request2 = HttpRequest.newBuilder().POST(bodyJson2).uri(uri2).build();
 
         HttpResponse<String> response1 = client.send(request1, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response2 = client.send(request2, HttpResponse.BodyHandlers.ofString());
+
         assertEquals(200, response1.statusCode());
+        assertEquals(200, response2.statusCode());
     }
     @Test
     void getSubtaskResponseTest() throws IOException, InterruptedException {
@@ -229,7 +236,6 @@ class HttpTaskServerTest {
 
     @Test
     void getEmptyPriorityTest() throws IOException, InterruptedException {
-
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create(PRIORITY_TASK_PATH);
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
@@ -251,12 +257,10 @@ class HttpTaskServerTest {
 
         assertEquals(200, response.statusCode());
         assertEquals(response.body(), gson.toJson(List.of(task1, task2)));
-
     }
 
     @Test
     void getPriorityTasks() throws IOException, InterruptedException {
-
         HttpClient client = HttpClient.newHttpClient();
         URI url = URI.create(PRIORITY_TASK_PATH);
         HttpRequest request = HttpRequest.newBuilder().uri(url).GET().build();
@@ -266,5 +270,4 @@ class HttpTaskServerTest {
         assertEquals(200, response.statusCode());
         assertEquals(response.body(), gson.toJson(taskManager.getPrioritizedTasks()));
     }
-
 }

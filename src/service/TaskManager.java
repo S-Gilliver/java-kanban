@@ -36,7 +36,7 @@ public interface TaskManager {
 
     List<Task> getHistory();
 
-    public void addPrioritizedTasks(Task task);
+    void addPrioritizedTasks(Task task);
 
-    public Set<Task> getPrioritizedTasks();
+    Set<Task> getPrioritizedTasks();
 }

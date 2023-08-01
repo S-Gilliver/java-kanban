@@ -3,21 +3,19 @@ package http.handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import model.Epic;
-import service.Manager;
 import service.TaskManager;
 
 import java.io.IOException;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class EpicHandler extends handle implements HttpHandler {
-    private final Gson gson = Manager.getGson();
+public class EpicHandler extends Handle {
+    private final Gson gson;
     private final TaskManager taskManager;
 
-    public EpicHandler(TaskManager taskManager) {
+    public EpicHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
+        this.gson = gson;
     }
 
     private int parsePathId(String strPath) {
@@ -72,7 +70,11 @@ public class EpicHandler extends handle implements HttpHandler {
     }
 
     private void addEpic(HttpExchange httpExchange) throws IOException {
-        String request = new String(httpExchange.getRequestBody().readAllBytes(), UTF_8);
+        String request = readText(httpExchange);
+        if (request.isEmpty()) {
+            httpExchange.sendResponseHeaders(400,0);
+            return;
+        }
         try {
             Epic epic = gson.fromJson(request, Epic.class);
             int id = epic.getId();

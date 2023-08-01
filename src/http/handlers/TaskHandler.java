@@ -3,21 +3,19 @@ package http.handlers;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import model.Task;
-import service.Manager;
 import service.TaskManager;
 
 import java.io.IOException;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 
-public class TaskHandler extends handle implements HttpHandler {
-    private final Gson gson = Manager.getGson();
+public class TaskHandler extends Handle  {
+    private final Gson gson;
     private final TaskManager taskManager;
 
-    public TaskHandler(TaskManager taskManager) {
+    public TaskHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
+        this.gson = gson;
     }
 
     private int parsePathId(String strPath) {
@@ -27,6 +25,7 @@ public class TaskHandler extends handle implements HttpHandler {
             return -1;
         }
     }
+
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
@@ -73,7 +72,11 @@ public class TaskHandler extends handle implements HttpHandler {
     }
 
     private void addTask(HttpExchange httpExchange) throws IOException {
-        String request = new String(httpExchange.getRequestBody().readAllBytes(), UTF_8);
+        String request = readText(httpExchange);
+        if (request.isEmpty()) {
+            httpExchange.sendResponseHeaders(400,0);
+            return;
+        }
         try {
             Task task = gson.fromJson(request, Task.class);
             int id = task.getId();

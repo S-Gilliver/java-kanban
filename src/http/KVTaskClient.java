@@ -14,18 +14,22 @@ public class KVTaskClient {
 
     public KVTaskClient(String url) {
         this.url = url;
+        apiToken = getApiToken();
+    }
+
+    private String getApiToken() {
         URI uri = URI.create(url + "/register");
         HttpRequest request = registration(uri);
         HttpResponse<String> response = null;
         try {
             response = httpClient.send(request, handler);
             if (response.statusCode() != 200) {
-                System.out.println("Не удалось обработать запрос");
+                throw new IOException("Не удалось обработать запрос");
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-        apiToken = response.body();
+        return response.body();
     }
 
     public void put(String key, String json) {
@@ -40,7 +44,7 @@ public class KVTaskClient {
         try {
             response = httpClient.send(request, handler);
             if (response.statusCode() != 200) {
-                System.out.println("Не удалось сохранить данные");
+                throw new IOException("Не удалось сохранить данные");
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
@@ -56,7 +60,7 @@ public class KVTaskClient {
         try {
             response = httpClient.send(request, handler);
             if (response.statusCode() != 200) {
-                System.out.println("Во время запроса произошла ошибка");
+                throw new IOException("Во время запроса произошла ошибка");
             }
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);

@@ -2,17 +2,17 @@ package http.handlers;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
 import service.TaskManager;
 
 import java.io.IOException;
 
-public class PrioritizedTaskHandler extends handle implements HttpHandler {
+public class PrioritizedTaskHandler extends Handle {
     private final TaskManager taskManager;
-    private final Gson gson = new Gson();
+    private final Gson gson;
 
-    public PrioritizedTaskHandler(TaskManager taskManager) {
+    public PrioritizedTaskHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
+        this.gson = gson;
     }
 
     @Override

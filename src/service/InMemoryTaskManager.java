@@ -13,7 +13,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Epic> epics = new HashMap<>();
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
     protected final HistoryManager historyManager = Manager.getDefaultHistory();
-    protected int generatedId = 1;
+    protected final TaskIdGenerator taskIdGenerator = new TaskIdGenerator();
 
     protected final Set<Task> prioritizedTasks = new TreeSet<>((o1, o2) -> {
         if ((o1.getStartTime() == null) && (o2.getStartTime() == null)) {
@@ -30,22 +30,35 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void createTask(Task task) {
         validateTaskPriority(task);
-        task.setId(generatedId++);
+        task.setId(taskIdGenerator.getNextId());
         tasks.put(task.getId(), task);
         addPrioritizedTasks(task);
     }
 
     @Override
     public void createEpic(Epic epic) {
-        epic.setId(generatedId++);
+        epic.setId(taskIdGenerator.getNextId());
         epics.put(epic.getId(), epic);
     }
 
     @Override
     public void createSubtask(Subtask subtask) {
         validateTaskPriority(subtask);
-        subtask.setId(generatedId++);
+        subtask.setId(taskIdGenerator.getNextId());
         final Epic epic = epics.get(subtask.getEpicId());
+        subtasks.put(subtask.getId(), subtask);
+        addPrioritizedTasks(subtask);
+        epic.getSubtasks().add(subtask);
+        updateEpicStatus(epic);
+        epic.calculateStartTime();
+        epic.calculateDuration();
+        epic.calculateEndTime();
+    }
+
+    public void createSubtaskByEpicId(Subtask subtask, int id) {
+        validateTaskPriority(subtask);
+        subtask.setId(taskIdGenerator.getNextId());
+        final Epic epic = epics.get(id);
         subtasks.put(subtask.getId(), subtask);
         addPrioritizedTasks(subtask);
         epic.getSubtasks().add(subtask);
@@ -251,26 +264,51 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private void validateTaskPriority(Task task) {
-            for (Task checkedTask : prioritizedTasks) {
-                if (task.getStartTime() == null || checkedTask.getStartTime() == null) continue;
-                if(task.getId() == checkedTask.getId() &&
-                        (task.getStartTime().isEqual(checkedTask.getStartTime()) ||
-                                task.getStartTime().isAfter(checkedTask.getStartTime()) &&
-                                        task.getStartTime().isBefore(checkedTask.getEndTime()))) continue;
+        for (Task checkedTask : prioritizedTasks) {
+            if (task.getStartTime() == null || checkedTask.getStartTime() == null) continue;
+            if (task.getId() == checkedTask.getId() &&
+                    (task.getStartTime().isEqual(checkedTask.getStartTime()) ||
+                            task.getStartTime().isAfter(checkedTask.getStartTime()) &&
+                                    task.getStartTime().isBefore(checkedTask.getEndTime()))) continue;
 
-                if (task.getStartTime().isEqual(checkedTask.getStartTime())) {
-                    throw new ManagerValidateException("В это время у вас уже есть задача: "
-                            + checkedTask.getTaskName());
-                } else if (task.getStartTime().isAfter(checkedTask.getStartTime()) &&
-                        task.getStartTime().isBefore(checkedTask.getEndTime())) {
-                    throw new ManagerValidateException("В это время вы должны выполнять другую задачу: "
-                            + checkedTask.getTaskName());
-                } else if (task.getEndTime().isAfter(checkedTask.getStartTime()) &&
-                        task.getEndTime().isBefore(checkedTask.getEndTime())) {
-                    throw new ManagerValidateException("В это время вы не успеете закончить эту задачу до начала задачи: "
-                            + checkedTask.getTaskName());
-                }
+            if (task.getStartTime().isEqual(checkedTask.getStartTime())) {
+                throw new ManagerValidateException("В это время у вас уже есть задача: "
+                        + checkedTask.getTaskName());
+            } else if (task.getStartTime().isAfter(checkedTask.getStartTime()) &&
+                    task.getStartTime().isBefore(checkedTask.getEndTime())) {
+                throw new ManagerValidateException("В это время вы должны выполнять другую задачу: "
+                        + checkedTask.getTaskName());
+            } else if (task.getEndTime().isAfter(checkedTask.getStartTime()) &&
+                    task.getEndTime().isBefore(checkedTask.getEndTime())) {
+                throw new ManagerValidateException("В это время вы не успеете закончить эту задачу до начала задачи: "
+                        + checkedTask.getTaskName());
             }
         }
     }
+
+    public final class TaskIdGenerator {
+        private int nextId = 1;
+
+        public int getNextId() {
+            int flag = 0;
+            while (flag == 0) {
+                if (tasks.containsKey(nextId) || epics.containsKey(nextId) || subtasks.containsKey(nextId)) {
+                    nextId++;
+                } else {
+                    flag = 1;
+                }
+            }
+            return nextId;
+        }
+
+        public int getId() {
+            return nextId;
+        }
+
+        public void setNextId(int id) {
+            nextId = id;
+        }
+    }
+}
+
 
