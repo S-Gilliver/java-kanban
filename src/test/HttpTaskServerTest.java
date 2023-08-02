@@ -251,6 +251,7 @@ class HttpTaskServerTest {
     void getHistoryTest() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         URI uri = URI.create(HISTORY_PATH);
+       // List<Task> g = httpTaskServer.ta
 
         HttpRequest request = HttpRequest.newBuilder().GET().uri(uri).build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());

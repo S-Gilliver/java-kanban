@@ -57,8 +57,8 @@ public class InMemoryTaskManager implements TaskManager {
 
     public void createSubtaskByEpicId(Subtask subtask, int id) {
         validateTaskPriority(subtask);
-        subtask.setId(taskIdGenerator.getNextId());
-        final Epic epic = epics.get(id);
+        subtask.setId(id);
+        final Epic epic = epics.get(subtask.getEpicId());
         subtasks.put(subtask.getId(), subtask);
         addPrioritizedTasks(subtask);
         epic.getSubtasks().add(subtask);

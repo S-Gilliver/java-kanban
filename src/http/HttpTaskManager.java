@@ -14,12 +14,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class HttpTaskManager extends FileBackedTasksManager {
-    public final KVTaskClient httpClient;
-    public final Gson gson;
-    final static String KEY_TASKS = "tasks";
-    final static String KEY_EPICS = "epics";
-    final static String KEY_SUBTASKS = "subTasks";
-    final static String KEY_HISTORY = "history";
+
+    private int maxId = 0;
+    private final KVTaskClient httpClient;
+    private final Gson gson;
+    private final static String KEY_TASKS = "tasks";
+    private final static String KEY_EPICS = "epics";
+    private final static String KEY_SUBTASKS = "subTasks";
+    private final static String KEY_HISTORY = "history";
 
     public HttpTaskManager(String url, Boolean load) {
         super(new File(url));
@@ -57,25 +59,24 @@ public class HttpTaskManager extends FileBackedTasksManager {
         List<Task> tasksList = gson.fromJson((taskJson), new TypeToken<ArrayList<Task>>() {}.getType());
         if (tasksList != null) {
             for (Task t : tasksList) {
-                createTask(t);
+                tasks.put(t.getId(), t);
+                addPrioritizedTasks(t);
+                findingMaxId(t.getId());
             }
         }
         List<Epic> epicsList = gson.fromJson((epicJson), new TypeToken<ArrayList<Epic>>() {}.getType());
         if (epicsList != null) {
             epicsList.forEach((epic) -> {
-                List<Subtask> subtasks2 = epic.getSubtasks();
                 epic.getSubtasks().clear();
-               // epics.put(epicsList.get(0).getId(), (Epic) epicsList);
-                createEpic(epic);
-                for (Subtask subtask1 : subtasks2) {
-                    createSubtaskByEpicId(subtask1, taskIdGenerator.getId());
-                }
+                epics.put(epic.getId(), epic);
+                findingMaxId(epic.getId());
             });
         }
         List<Subtask> subTasksList = gson.fromJson((subTaskJson), new TypeToken<ArrayList<Subtask>>() {}.getType());
         if (subTasksList != null) {
             for (Subtask s : subTasksList) {
-                createSubtask(s);
+                createSubtaskByEpicId(s, s.getId());
+                findingMaxId(s.getId());
             }
         }
 
@@ -85,5 +86,12 @@ public class HttpTaskManager extends FileBackedTasksManager {
             getEpicById(idTask);
             getSubtaskById(idTask);
         }
+    }
+
+    private void findingMaxId(int id) {
+        if (id > maxId) {
+            maxId = id;
+        }
+        taskIdGenerator.setNextId(id);
     }
 }
