@@ -4,8 +4,8 @@ import model.Status;
 import model.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import service.HistoryManager;
-import service.InMemoryHistoryManager;
+import service.history.HistoryManager;
+import service.history.InMemoryHistoryManager;
 
 import java.util.ArrayList;
 

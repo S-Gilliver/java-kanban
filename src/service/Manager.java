@@ -5,6 +5,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import http.HttpTaskManager;
 import http.KVServer;
+import service.history.HistoryManager;
+import service.history.InMemoryHistoryManager;
 
 import java.io.IOException;
 import java.time.LocalDateTime;

@@ -2,7 +2,7 @@ package test;
 
 import model.*;
 import org.junit.jupiter.api.Test;
-import service.ManagerValidateException;
+import exception.ManagerValidateException;
 import service.TaskManager;
 
 import java.util.ArrayList;

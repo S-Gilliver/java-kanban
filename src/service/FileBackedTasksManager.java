@@ -1,6 +1,7 @@
 package service;
 
 import model.*;
+import service.history.HistoryManager;
 
 import java.io.*;
 import java.util.ArrayList;
